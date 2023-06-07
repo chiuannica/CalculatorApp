@@ -213,24 +213,26 @@
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hBK-Ew-V23" userLabel="Overall Total Label">
                                         <rect key="frame" x="0.0" y="570" width="374" height="30"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="30" id="d62-FY-dBB"/>
                                             <constraint firstAttribute="height" constant="30" id="ey1-jg-Ma8"/>
-                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="30" id="lQb-ks-wlI"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
+                                <constraints>
+                                    <constraint firstItem="S9c-px-3mB" firstAttribute="top" secondItem="S3p-BG-nlp" secondAttribute="bottom" constant="10" id="TY9-Vp-57A"/>
+                                    <constraint firstItem="S9c-px-3mB" firstAttribute="top" secondItem="S3p-BG-nlp" secondAttribute="bottom" constant="10" id="cyq-Pv-w02"/>
+                                    <constraint firstItem="PJL-Od-BEH" firstAttribute="top" secondItem="ODK-tC-rEp" secondAttribute="bottom" constant="10" id="knN-FR-FvW"/>
+                                </constraints>
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="aBL-o6-2Jg" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="QZ2-Hi-of2"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="aBL-o6-2Jg" secondAttribute="bottom" constant="22" id="UJG-1X-FW2"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="aBL-o6-2Jg" secondAttribute="trailing" constant="20" id="WtO-oq-7XJ"/>
-                            <constraint firstItem="aBL-o6-2Jg" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="Xzd-il-Kzn"/>
+                            <constraint firstItem="aBL-o6-2Jg" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="1Y2-6W-ruj"/>
+                            <constraint firstItem="aBL-o6-2Jg" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="vYV-4p-0y8"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="aBL-o6-2Jg" secondAttribute="trailing" constant="20" id="xLt-24-AQV"/>
                         </constraints>
                     </view>
                     <connections>

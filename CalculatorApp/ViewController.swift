@@ -20,7 +20,6 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         otherTextField.isHidden = true
         otherLabel.isHidden = true
-        stackView.spacing = 2
         tipControl.addTarget(self, action: #selector(onTipAmountChanged(_:)), for: .valueChanged)
         
         splitBillControl.addTarget(self, action: #selector(onSplitBillChanged(_:)), for: .valueChanged)
