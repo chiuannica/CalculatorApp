@@ -3,6 +3,8 @@ import UIKit
 class ViewController: UIViewController {
     @IBOutlet weak var stackView: UIStackView!
     @IBOutlet weak var billAmountTextField: UITextField!
+    @IBOutlet weak var splitBillControl: UISegmentedControl!
+    @IBOutlet weak var splitTipControl: UISegmentedControl!
     @IBOutlet weak var tipControl: UISegmentedControl!
     
     @IBOutlet weak var otherTextField: UITextField!
@@ -18,10 +20,24 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         otherTextField.isHidden = true
         otherLabel.isHidden = true
-        stackView.spacing = 10
+        stackView.spacing = 2
+        tipControl.addTarget(self, action: #selector(onTipAmountChanged(_:)), for: .valueChanged)
+        
+        splitBillControl.addTarget(self, action: #selector(onSplitBillChanged(_:)), for: .valueChanged)
+
+        
+        splitTipControl.addTarget(self, action: #selector(onSplitTipChanged(_:)), for: .valueChanged)
     }
     
     @IBAction func onBillAmountChanged(_ sender: Any) {
+        updateFields()
+    }
+    
+    @IBAction func onSplitBillChanged(_ sender: Any) {
+        updateFields()
+    }
+    
+    @IBAction func onSplitTipChanged(_ sender: Any) {
         updateFields()
     }
     
@@ -63,32 +79,133 @@ class ViewController: UIViewController {
         return taxPercentage / 100.0
     }
     
-    func updateFields() {
-        let taxPercentage = getTax()
-        let tipPercentage = getTip()
-        
-        let individualAmounts = billAmountTextField.text!
+    func getBillSplit() -> String {
+        var billSplit = "proportional"
+        let billSplitIndex = splitBillControl.selectedSegmentIndex
+        if (billSplitIndex == 1) {
+            billSplit = "even"
+        }
+        return billSplit
+    }
+    
+    func getTipSplit() -> String {
+        var tipSplit = "proportional"
+        let tipSplitIndex = splitTipControl.selectedSegmentIndex
+        if (tipSplitIndex == 1) {
+            tipSplit = "even"
+        }
+        return tipSplit
+    }
+    
+    func getIndividualAmounts() -> [Double] {
+        return billAmountTextField.text!
             .components(separatedBy: " ")
             .compactMap { Double($0) }
         ;
+    }
+    
+    func updateFields() {
+        let taxMultiplier = getTax()
+        let tipMultiplier = getTip()
+        let billSplit = getBillSplit()
+        let tipSplit = getTipSplit()
+        let individualAmounts = getIndividualAmounts()
         
         var amountsWithTax: [Double] = []
         var tipAmounts: [Double] = []
         var individualTotals: [Double] = []
-        
         var overallTotal = 0.0
         
-        for amount in individualAmounts {
-            let amountWithTax =  amount + (amount * taxPercentage)
-            amountsWithTax.append(amountWithTax)
+        if (billSplit == "proportional" && tipSplit == "proportional") {
+            // calculate proportionally
+            // for each amount, calculate its tax and add it
+            // for the combined amount and tax, calculate its tip
+            // combine the amount with tax and tip to get individual total
+            // combine all individual totals to get overall total
+            for amount in individualAmounts {
+                let amountWithTax =  amount + (amount * taxMultiplier)
+                amountsWithTax.append(amountWithTax)
+                
+                let tip = tipMultiplier * amountWithTax
+                tipAmounts.append(tip)
+                
+                let individualTotal = amountWithTax + tip
+                individualTotals.append(amountWithTax + tip)
+                
+                overallTotal += individualTotal
+            }
+        } else if (billSplit == "even" && tipSplit == "even") {
+            // divide everything evenly
+            // add all amounts to get the overall amount
+            // calculate the overall tax from the amount
+            // calculate the overall tip from the amount with tax
+            // split the overall amount with tax and overall tip evenly
+            // the overall total is overall amount with tax and overall tip
+            var overallAmount = 0.0
+            for amount in individualAmounts {
+                overallAmount += amount
+            }
+            let overallAmountWithTax = overallAmount + (overallAmount * taxMultiplier)
+            let overallTip = (overallAmountWithTax * tipMultiplier)
+            overallTotal = overallAmountWithTax + overallTip
             
-            let tip = tipPercentage * amountWithTax
-            tipAmounts.append(tip)
+            let individualAmountWithTax = (overallAmountWithTax) / Double(individualAmounts.count)
             
-            let individualTotal = amountWithTax + tip
-            individualTotals.append(amountWithTax + tip)
+            let individualTip = overallTip / Double(individualAmounts.count)
             
-            overallTotal += individualTotal
+            let individualTotal = overallTotal / Double(individualAmounts.count)
+
+            for _ in individualAmounts {
+                amountsWithTax.append(individualAmountWithTax)
+                tipAmounts.append(individualTip)
+                individualTotals.append(individualTotal)
+            }
+        } else if (billSplit == "proportional" && tipSplit == "even") {
+            
+            // split the bill proportionally, pay tip evenly
+            // calculate the proportional amount with tax
+            // calculate the total tip, split evenly
+            // individual totals are the proportional
+            
+            var overallAmountWithTax = 0.0
+            for amount in individualAmounts {
+                let amountWithTax =  amount + (amount * taxMultiplier)
+                overallAmountWithTax += (amount + (amount * taxMultiplier))
+                amountsWithTax.append(amountWithTax)
+            }
+            let overallTip = (overallAmountWithTax * tipMultiplier)
+            let individualTip = overallTip / Double(individualAmounts.count)
+                            
+            for amountWithTax in amountsWithTax {
+                tipAmounts.append(individualTip)
+                individualTotals.append(amountWithTax + individualTip)
+            }
+            overallTotal = overallAmountWithTax + overallTip
+        } else if (billSplit == "even" && tipSplit == "proportional") {
+            // split the amounts evenly, split the tip proportionally
+            // calculate the proportional individual amount with tax to calculate the proportional tip
+            // clear the amounts and split the overall amount with tax evenly
+            
+            var overallAmountWithTax = 0.0
+            for amount in individualAmounts {
+                let amountWithTax = amount + (amount * taxMultiplier)
+                amountsWithTax.append(amountWithTax)
+                overallAmountWithTax += amountWithTax
+            }
+            var overallTip = 0.0
+            for amount in amountsWithTax {
+                let individualTip = amount * tipMultiplier
+                tipAmounts.append(individualTip)
+                overallTip += individualTip
+            }
+            let individualAmountWithTax = overallAmountWithTax / Double(individualAmounts.count)
+            
+            amountsWithTax.removeAll()
+            for tip in tipAmounts {
+                individualTotals.append(individualAmountWithTax + tip)
+                amountsWithTax.append(individualAmountWithTax)
+            }
+            overallTotal = overallAmountWithTax + overallTip
         }
         
         
